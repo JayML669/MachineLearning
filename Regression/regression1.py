@@ -1,10 +1,14 @@
 import pandas as pd
-import quandl, math, datetime
+import quandl
+import math
+import datetime
+import os
 import numpy as np
 from sklearn import preprocessing, model_selection, svm
 from sklearn.linear_model import LinearRegression
 import matplotlib.pyplot as plt
 from matplotlib import style
+import pickle
 
 style.use('ggplot')
 
@@ -18,7 +22,7 @@ df['PCT_change'] = (df['Adj. Close']-df['Adj. Open'])/df['Adj. Open'] * 100.0
 df = df[['Adj. Close', 'HL_PCT', 'PCT_change', 'Adj. Volume']]
 
 forecast_col = 'Adj. Close'
-df.fillna(-99999, inplace = True)
+df.fillna(-99999, inplace=True)
 
 forecast_out = int(math.ceil(0.01*len(df)))
 
@@ -30,15 +34,23 @@ X = preprocessing.scale(X)
 X_lately = X[-forecast_out:]
 X = X[:-forecast_out]
 
-df.dropna(inplace = True)
+df.dropna(inplace=True)
 y = np.array(df['label'])
 
+X_train, X_test, y_train, y_test = model_selection.train_test_split(X, y, test_size=0.2)
+
+if os.path.exists('Regression\linearRegression.pickle'):
+    print('Loading The Model')
+    pickle_in = open('Regression\linearRegression.pickle', 'rb')
+    clf = pickle.load(pickle_in)
+else:
+    print('Training The Model')
+    clf = LinearRegression(n_jobs=-1)
+    clf.fit(X_train, y_train)
+    with open('Regression\linearRegression.pickle', 'wb') as f:
+        pickle.dump(clf, f)
 
 
-X_train, X_test, y_train, y_test = model_selection.train_test_split(X, y, test_size = 0.2)
-
-clf = LinearRegression(n_jobs = -1)
-clf.fit(X_train, y_train)
 accuracy = clf.score(X_test, y_test)
 
 forecast_set = clf.predict(X_lately)
