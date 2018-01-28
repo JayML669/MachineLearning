@@ -27,12 +27,26 @@ def best_fit_slope_yint(xs, ys):
     return m, b
 
 
+def evaluate_model(model, original_line):
+    meany = mean(original_line)
+
+    squared_error_model = sum((model-original_line)**2)
+    squared_error_mean = sum((meany-ys)**2)
+    r_squared = 1 - (squared_error_model / squared_error_mean)
+
+    return r_squared
+
+
 m, b = best_fit_slope_yint(xs, ys)
-print(m, b)
 
-x = np.linspace(0, len(xs), 100)
-y = m*x+b
+model = [(m*x+b) for x in xs]
+coefficient_of_determination = evaluate_model(model, ys)
 
-plt.plot(x, y)
+print(m, b, coefficient_of_determination)
+
+xplot = np.linspace(0, len(xs), 100)
+y = m*xplot+b
+
+plt.plot(xplot, y)
 plt.scatter(xs, ys)
 plt.show()
