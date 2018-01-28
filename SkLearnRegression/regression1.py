@@ -39,15 +39,15 @@ y = np.array(df['label'])
 
 X_train, X_test, y_train, y_test = model_selection.train_test_split(X, y, test_size=0.2)
 
-if os.path.exists('Regression\linearRegression.pickle'):
+if os.path.exists('SkLearnRegression\linearRegression.pickle'):
     print('Loading The Model')
-    pickle_in = open('Regression\linearRegression.pickle', 'rb')
+    pickle_in = open('SkLearnRegression\linearRegression.pickle', 'rb')
     clf = pickle.load(pickle_in)
 else:
     print('Training The Model')
     clf = LinearRegression(n_jobs=-1)
     clf.fit(X_train, y_train)
-    with open('Regression\linearRegression.pickle', 'wb') as f:
+    with open('SkLearnRegression\linearRegression.pickle', 'wb') as f:
         pickle.dump(clf, f)
 
 
